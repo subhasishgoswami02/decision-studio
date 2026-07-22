@@ -1,0 +1,16 @@
+{
+  "name": "decision-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A configurable loan decisioning engine demo: eligibility rules, pricing tiers, and partner routing, all adjustable without a code change.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}
