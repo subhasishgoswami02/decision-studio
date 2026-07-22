@@ -4,7 +4,7 @@ A working demo of a configurable loan decisioning engine, built to show how
 lending decisions can move from a manual queue to a sub-second, fully traceable
 pipeline built on configurable primitives.
 
-**Live demo:** add your Vercel URL here after deploying.
+**Live demo:** https://decision-studio-subhasishgoswami02s-projects.vercel.app
 
 ## What it demonstrates
 
