@@ -11,6 +11,11 @@ export default function App({ Component, pageProps }) {
         <title>Decision Studio</title>
         <meta name="description" content="A configurable loan decisioning engine: eligibility rules, pricing tiers, and partner routing, adjustable without a code change." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:title" content="Decision Studio: a live loan decisioning engine" />
+        <meta property="og:description" content="Configurable eligibility rules, pricing tiers, partner routing, and a full audit trace. Decisions in milliseconds." />
+        <meta property="og:image" content="https://decision-studio-one.vercel.app/thumb.png" />
+        <meta property="og:url" content="https://decision-studio-one.vercel.app/" />
+        <meta property="og:type" content="website" />
       </Head>
       <header className="nav">
         <div className="nav-inner">
