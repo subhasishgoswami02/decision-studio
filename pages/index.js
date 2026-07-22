@@ -4,11 +4,14 @@ import { DEFAULT_CONFIG } from "../lib/defaults";
 const BLANK = {
   citizenship: "IN",
   destination: "US",
-  program: "graduate",
+  degreeLevel: "masters",
+  fieldOfStudy: "stem",
   schoolTier: "1",
+  monthsToGraduation: "18",
   loanAmount: "45000",
   householdIncome: "30000",
   creditHistory: "thin",
+  workExpYears: "3",
   admitConfirmed: true,
 };
 
@@ -51,17 +54,8 @@ export default function Apply() {
           audit trace. Active configuration: <strong>{configSource}</strong>.
         </p>
         <form onSubmit={submit}>
+          <h2>Program</h2>
           <div className="row">
-            <label>Citizenship
-              <select value={form.citizenship} onChange={set("citizenship")}>
-                <option value="IN">India</option>
-                <option value="CN">China</option>
-                <option value="BR">Brazil</option>
-                <option value="NG">Nigeria</option>
-                <option value="VN">Vietnam</option>
-                <option value="XX">Other</option>
-              </select>
-            </label>
             <label>Study destination
               <select value={form.destination} onChange={set("destination")}>
                 <option value="US">United States</option>
@@ -69,12 +63,23 @@ export default function Apply() {
                 <option value="UK">United Kingdom</option>
               </select>
             </label>
+            <label>Degree level
+              <select value={form.degreeLevel} onChange={set("degreeLevel")}>
+                <option value="masters">Masters</option>
+                <option value="mba">MBA</option>
+                <option value="phd">PhD</option>
+                <option value="undergraduate">Undergraduate</option>
+              </select>
+            </label>
           </div>
           <div className="row">
-            <label>Program
-              <select value={form.program} onChange={set("program")}>
-                <option value="graduate">Graduate</option>
-                <option value="undergraduate">Undergraduate</option>
+            <label>Field of study
+              <select value={form.fieldOfStudy} onChange={set("fieldOfStudy")}>
+                <option value="stem">STEM</option>
+                <option value="business">Business</option>
+                <option value="medicine">Medicine</option>
+                <option value="law">Law</option>
+                <option value="other">Other</option>
               </select>
             </label>
             <label>School tier
@@ -87,19 +92,15 @@ export default function Apply() {
             </label>
           </div>
           <div className="row">
-            <label>Loan amount (USD)
-              <input type="number" value={form.loanAmount} onChange={set("loanAmount")} min="0" />
-            </label>
-            <label>Household income (USD/yr)
-              <input type="number" value={form.householdIncome} onChange={set("householdIncome")} min="0" />
-            </label>
-          </div>
-          <div className="row">
-            <label>Credit history
-              <select value={form.creditHistory} onChange={set("creditHistory")}>
-                <option value="established">Established</option>
-                <option value="thin">Thin file</option>
-                <option value="none">No history</option>
+            <label>Expected graduation
+              <select value={form.monthsToGraduation} onChange={set("monthsToGraduation")}>
+                <option value="6">Within 6 months</option>
+                <option value="12">In about a year</option>
+                <option value="18">In about 18 months</option>
+                <option value="24">In about 2 years</option>
+                <option value="36">In about 3 years</option>
+                <option value="60">In 5+ years</option>
+                <option value="-3">Already graduated</option>
               </select>
             </label>
             <label className="check">
@@ -107,21 +108,70 @@ export default function Apply() {
               Admission confirmed
             </label>
           </div>
+
+          <h2>Applicant profile</h2>
+          <div className="row">
+            <label>Citizenship
+              <select value={form.citizenship} onChange={set("citizenship")}>
+                <option value="IN">India</option>
+                <option value="CN">China</option>
+                <option value="BR">Brazil</option>
+                <option value="NG">Nigeria</option>
+                <option value="VN">Vietnam</option>
+                <option value="XX">Other</option>
+              </select>
+            </label>
+            <label>Credit history
+              <select value={form.creditHistory} onChange={set("creditHistory")}>
+                <option value="established">Established</option>
+                <option value="thin">Thin file</option>
+                <option value="none">No history</option>
+              </select>
+            </label>
+          </div>
+          <div className="row">
+            <label>Work experience (years)
+              <input type="number" min="0" max="40" value={form.workExpYears} onChange={set("workExpYears")} />
+            </label>
+            <label>Household income (USD/yr)
+              <input type="number" min="0" value={form.householdIncome} onChange={set("householdIncome")} />
+            </label>
+          </div>
+
+          <h2>Loan</h2>
+          <div className="row">
+            <label>Loan amount (USD)
+              <input type="number" min="0" value={form.loanAmount} onChange={set("loanAmount")} />
+            </label>
+          </div>
           <button className="primary" disabled={loading}>
-            {loading ? "Deciding..." : "Get decision"}
+            {loading ? "Deciding..." : "Get my decision"}
           </button>
         </form>
       </section>
 
       <section className="card">
         <h1>Decision</h1>
-        {!result && <p className="muted">Submit an application to see the decision and its trace.</p>}
+        {!result && <p className="muted">Submit an application to see the decision and its trace. Tip: open the Rules Console, change a rule, and resubmit. No deploy needed.</p>}
         {result && (
           <>
             <div className={`badge ${result.decision?.toLowerCase()}`}>{result.decision}</div>
             <p className="latency">Rendered in {result.totalMs} ms</p>
             {result.score != null && (
               <p><strong>Score:</strong> {result.score} / 100</p>
+            )}
+            {result.breakdown && (
+              <div className="factors">
+                {result.breakdown.map((b) => (
+                  <div className="factor" key={b.factor}>
+                    <span className="factor-name">{b.factor}</span>
+                    <span className="factor-bar" aria-hidden="true">
+                      <span className="factor-fill" style={{ width: `${(b.points / b.weight) * 100}%` }} />
+                    </span>
+                    <span className="factor-pts">{b.points.toFixed(1)}/{b.weight}</span>
+                  </div>
+                ))}
+              </div>
             )}
             {result.pricing && (
               <p><strong>Pricing:</strong> Band {result.pricing.band} ({result.pricing.label}), {result.pricing.apr}% APR</p>

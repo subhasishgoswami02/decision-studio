@@ -87,6 +87,11 @@ export default function RulesConsole() {
                   <input type="number" value={r.params.maxAmount} onChange={(e) => setRuleParam(r.id, "maxAmount", e.target.value)} />
                 </label>
               )}
+              {"maxMonthsToGraduation" in r.params && (
+                <label>Max months to graduation
+                  <input type="number" min="1" max="120" value={r.params.maxMonthsToGraduation} onChange={(e) => setRuleParam(r.id, "maxMonthsToGraduation", e.target.value)} />
+                </label>
+              )}
               {"maxTier" in r.params && (
                 <label>Minimum tier (1 to 4)
                   <input type="number" min="1" max="4" value={r.params.maxTier} onChange={(e) => setRuleParam(r.id, "maxTier", e.target.value)} />
