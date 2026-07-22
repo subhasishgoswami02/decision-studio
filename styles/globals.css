@@ -90,3 +90,12 @@ button.ghost:hover { color: var(--text); border-color: var(--muted); }
   max-width: 1060px; margin: 10px auto 40px; padding: 0 20px;
   color: var(--muted); font-size: 13px;
 }
+
+/* Section headers inside the form */
+form h2 { margin-top: 18px; }
+/* Score factor bars */
+.factors { margin: 10px 0 14px; }
+.factor { display: grid; grid-template-columns: 110px 1fr 56px; gap: 10px; align-items: center; padding: 3px 0; font-size: 12.5px; color: var(--muted); }
+.factor-bar { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; display: block; }
+.factor-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.factor-pts { text-align: right; font-variant-numeric: tabular-nums; }
