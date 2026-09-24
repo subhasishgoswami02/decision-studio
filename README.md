@@ -4,7 +4,7 @@ A working demo of a configurable loan decisioning engine, built to show how
 lending decisions can move from a manual queue to a sub-second, fully traceable
 pipeline built on configurable primitives.
 
-**Live demo:** https://decision-studio-subhasishgoswami02s-projects.vercel.app
+**Live demo:** https://decision-studio-one.vercel.app
 
 ## What it demonstrates
 
@@ -44,6 +44,6 @@ needed. Vercel auto-detects Next.js.
 
 ## Author
 
-Subhasish Goswami, Senior Manager, Product.
+Subhasish Goswami, Senior Manager, Product. Portfolio: [subhasishgoswami.com](https://subhasishgoswami.com)
 Built as a portfolio artifact; all rules, tiers, and numbers are illustrative,
 not any lender's actual credit policy.
