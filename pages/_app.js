@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }) {
         <Component {...pageProps} />
       </main>
       <footer className="footer">
-        Built by Subhasish Goswami. A demo of decisioning built on configurable
+        Built by <a href="https://subhasishgoswami.com">Subhasish Goswami</a>. A demo of decisioning built on configurable
         primitives: eligibility rules, pricing tiers, and partner routing you can
         change without a code deploy.
       </footer>
