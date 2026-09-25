@@ -1,16 +1,33 @@
 {
   "name": "decision-studio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "A configurable loan decisioning engine demo: eligibility rules, pricing tiers, and partner routing, all adjustable without a code change.",
+  "description": "A configurable student-loan decisioning engine demo: eligibility rules, a weighted scorecard, pricing tiers and partner routing, adjustable without a code change, with a full decision trace and a policy test suite.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:a11y": "node tests/e2e/a11y.mjs"
   },
   "dependencies": {
-    "next": "14.2.5",
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/sora": "5.3.0",
+    "next": "15.5.26",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "playwright": "1.56.1",
+    "vitest": "5.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "postcss": "8.5.28"
   }
 }
