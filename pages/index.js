@@ -13,6 +13,7 @@ import { usePolicy } from "../lib/usePolicy";
 const OPENING = "borderline-review";
 
 const usd = (n) => `$${Number(n).toLocaleString("en-US")}`;
+const usdShort = (n) => (n >= 1000 && n % 1000 === 0 ? `$${(n / 1000).toLocaleString("en-US")}K` : usd(n));
 const years = (n) => (n === 1 ? "1 year" : `${n} years`);
 
 const GRADUATION = [
@@ -60,6 +61,18 @@ export default function Apply() {
 
   const thresholds = policy.config.decisionThresholds;
   const range = policy.config.eligibilityRules.find((r) => r.id === "amount-range" && r.enabled)?.params;
+  // Loan hint: quiet inside the policy range, a clear warning outside it.
+  const loanHint = (() => {
+    if (!range) return { text: "The amount rule is switched off in the rules console, so any amount passes it.", tone: null };
+    const amt = Number(form.loanAmount);
+    if (form.loanAmount !== "" && Number.isFinite(amt)) {
+      if (amt > range.maxAmount)
+        return { text: `Over the policy's ${usd(range.maxAmount)} limit, so this is declined on amount.`, tone: "warn" };
+      if (amt < range.minAmount)
+        return { text: `Under the policy's ${usd(range.minAmount)} minimum, so this is declined on amount.`, tone: "warn" };
+    }
+    return { text: `This policy lends ${usd(range.minAmount)} to ${usd(range.maxAmount)}.`, tone: null };
+  })();
 
   // Validate and decide on every change. The engine is pure and takes well
   // under a millisecond, so it runs right here in the browser.
@@ -269,12 +282,10 @@ export default function Apply() {
               display={usd}
               input={{ min: 1000, max: 500000 }}
               band={range ? [range.minAmount, range.maxAmount] : null}
+              bandLabel={usdShort}
               onChange={set("loanAmount")}
-              hint={
-                range
-                  ? `The policy lends ${usd(range.minAmount)} to ${usd(range.maxAmount)} (shaded). Outside that, the amount rule declines.`
-                  : "The amount rule is switched off in the rules console."
-              }
+              hint={loanHint.text}
+              hintTone={loanHint.tone}
               error={errors.loanAmount}
             />
           </div>

@@ -40,7 +40,9 @@ export function Range({
   onBlur,
   input,
   band,
+  bandLabel,
   hint,
+  hintTone,
   error,
 }) {
   // Typed amounts are held as a draft and committed on Enter, on blur, or
@@ -59,12 +61,14 @@ export function Range({
   const clamped = valid ? Math.min(max, Math.max(min, n)) : min;
   const pct = ((clamped - min) / (max - min)) * 100;
   const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null].filter(Boolean).join(" ") || undefined;
-  const bandStyle = band
-    ? {
-        left: `${((band[0] - min) / (max - min)) * 100}%`,
-        width: `${((Math.min(band[1], max) - band[0]) / (max - min)) * 100}%`,
-      }
-    : null;
+  // The lendable range is drawn as a bracket under the track, with its two
+  // limits labelled, so the slider itself stays a clean, single control.
+  const at = (v) => ((Math.min(max, Math.max(min, v)) - min) / (max - min)) * 100;
+  const bandL = band ? at(band[0]) : 0;
+  const bandR = band ? at(band[1]) : 0;
+  const bandStyle = band ? { left: `${bandL}%`, width: `${Math.max(0, bandR - bandL)}%` } : null;
+  const edge = (p) => (p < 6 ? "is-start" : p > 94 ? "is-end" : "");
+  const showBandLabels = band && bandLabel && bandR - bandL >= 14;
 
   return (
     <div className="ctl">
@@ -79,8 +83,18 @@ export function Range({
         )}
       </div>
       <div className={`range-row${input ? " with-input" : ""}`}>
-        <div className="range-wrap" style={{ "--pct": `${pct}%` }}>
+        <div className={`range-wrap${band ? " has-band" : ""}`} style={{ "--pct": `${pct}%` }}>
           {bandStyle && <span className="range-band" style={bandStyle} aria-hidden="true" />}
+          {showBandLabels && (
+            <>
+              <span className={`range-band-label ${edge(bandL)}`} style={{ left: `${bandL}%` }} aria-hidden="true">
+                {bandLabel(band[0])}
+              </span>
+              <span className={`range-band-label ${edge(bandR)}`} style={{ left: `${bandR}%` }} aria-hidden="true">
+                {bandLabel(band[1])}
+              </span>
+            </>
+          )}
           <input
             id={input ? `${id}-range` : id}
             type="range"
@@ -129,8 +143,14 @@ export function Range({
         )}
       </div>
       {hint && (
-        <p className="hint" id={`${id}-hint`}>
-          {hint}
+        <p className={`hint${hintTone === "warn" ? " hint-warn" : ""}`} id={`${id}-hint`}>
+          {hintTone === "warn" && (
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+              <path d="M10 3.5 18 17H2z" strokeLinejoin="round" />
+              <path d="M10 8.5v3.6M10 14.4v.1" />
+            </svg>
+          )}
+          <span>{hint}</span>
         </p>
       )}
       {error && draft === null && (

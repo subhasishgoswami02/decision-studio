@@ -65,9 +65,9 @@ html[data-theme="dark"] {
   --bad-fg: #f59b91;
   --bad-bg: #3a1714;
 
-  --zone-decline: #4a2320;
-  --zone-review: #463515;
-  --zone-approve: #173d28;
+  --zone-decline: #8a3b3b;
+  --zone-review: #8a6420;
+  --zone-approve: #2f7a52;
 
   --shadow: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 12px 32px rgb(0 0 0 / 0.28);
   --glow: rgb(124 156 240 / 0.10);
@@ -558,11 +558,26 @@ fieldset.seg > legend { margin-bottom: 6px; font-family: var(--font-sans); }
 .ctl-value { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
 .range-row.with-input { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 12px; align-items: center; }
 .range-wrap { position: relative; display: flex; align-items: center; height: 32px; }
+.range-row.with-input:has(.has-band) { align-items: start; }
+.money input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.money input[type="number"]::-webkit-outer-spin-button, .money input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.range-wrap.has-band { height: 48px; align-items: flex-start; padding-top: 2px; }
 .range-band {
-  position: absolute; top: 50%; height: 18px; transform: translateY(-50%); border-radius: 3px;
-  background: color-mix(in oklab, var(--ok-fg) 26%, transparent);
-  border-left: 2px solid var(--ok-fg); border-right: 2px solid var(--ok-fg);
+  position: absolute; top: 25px; height: 2px; background: var(--ok-fg); opacity: 0.75; border-radius: 1px;
 }
+.range-band::before, .range-band::after {
+  content: ""; position: absolute; top: -4px; width: 2px; height: 6px; background: var(--ok-fg); border-radius: 1px;
+}
+.range-band::before { left: 0; }
+.range-band::after { right: 0; }
+.range-band-label {
+  position: absolute; top: 30px; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.range-band-label.is-start { transform: none; }
+.range-band-label.is-end { transform: translateX(-100%); }
+.hint-warn { display: flex; gap: 6px; align-items: flex-start; color: var(--warn-fg); font-weight: 600; }
+.hint-warn svg { flex: none; margin-top: 1px; }
 .range-wrap input[type="range"] {
   -webkit-appearance: none; appearance: none; position: relative; z-index: 1;
   width: 100%; height: 32px; margin: 0; background: transparent; cursor: pointer;
