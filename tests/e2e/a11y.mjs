@@ -51,8 +51,22 @@ async function run() {
           // anything else sharing the server.
           extraHTTPHeaders: { "x-forwarded-for": `10.99.${contextIndex}.1` },
         });
+        // The site picks its theme from localStorage (dark unless "light").
+        await context.addInitScript((t) => {
+          try {
+            window.localStorage.setItem("ds-theme", t);
+          } catch (e) {}
+        }, scheme);
         const page = await context.newPage();
         const ctx = { width, scheme };
+        // Console errors (hydration mismatches, CSP blocks, crashes) fail the run.
+        // Vercel's preview-only feedback script is blocked by our CSP by design.
+        const consoleError = (text) => {
+          if (/vercel\.live/.test(text)) return;
+          errors.push({ ...ctx, message: `console: ${text.split("\n")[0].slice(0, 200)}` });
+        };
+        page.on("console", (m) => m.type() === "error" && consoleError(m.text()));
+        page.on("pageerror", (e) => consoleError(e.message));
         try {
           for (const path of PAGES) {
             await page.goto(`${BASE_URL}${path}`, { waitUntil: "networkidle" });
@@ -60,29 +74,48 @@ async function run() {
           }
 
           await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
+          const confirmed = () =>
+            page.waitForFunction(
+              () => /Confirmed by the decision API/.test(document.querySelector(".result .timing")?.textContent || ""),
+              null,
+              { timeout: 10000 }
+            );
           for (const name of PRESETS) {
             const button = page.getByRole("button", { name: new RegExp(`^${escapeRe(name)}`) });
-            const response = page.waitForResponse((r) => r.url().endsWith("/api/decide"));
             await button.click();
-            const res = await response;
-            if (!res.ok()) throw new Error(`preset "${name}": /api/decide returned ${res.status()}`);
             await page.waitForFunction(
               (label) => {
                 const b = [...document.querySelectorAll("button[aria-pressed='true']")];
-                return b.some((el) => el.textContent.startsWith(label)) && document.querySelector(".badge");
+                return b.some((el) => el.textContent.trim().startsWith(label)) && document.querySelector(".badge");
               },
               name,
               { timeout: 10000 }
             );
             await page.locator(".badge").first().waitFor({ state: "visible" });
+            await page.waitForTimeout(700); // let the API check start and settle
+            await confirmed();
             await scan(page, { ...ctx, page: "/", state: `preset: ${name}` });
           }
 
+          // Move the loan slider by keyboard: the decision updates and deltas appear.
+          await page.getByRole("button", { name: /^Borderline/ }).click();
+          await page.locator("#loanAmount-range").focus();
+          for (let i = 0; i < 10; i++) await page.keyboard.press("ArrowLeft");
+          await page.waitForTimeout(700);
+          await confirmed();
+          await scan(page, { ...ctx, page: "/", state: "slider moved" });
+
+          // Open a pipeline step: the trace opens with that step highlighted.
+          await page.locator(".pipe-btn").nth(1).click();
+          await page.locator(".trace li.is-focus").first().waitFor({ state: "visible" });
+          await scan(page, { ...ctx, page: "/", state: "trace step opened" });
+
+          // Clear the loan amount: a field error and the stale-result note appear.
           await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" });
           await page.fill("#loanAmount", "");
-          await page.getByRole("button", { name: /^Get decision/ }).click();
-          await page.locator(".error-summary").waitFor({ state: "visible" });
-          await scan(page, { ...ctx, page: "/", state: "form error" });
+          await page.locator("#loanAmount-error").waitFor({ state: "visible" });
+          await page.locator(".stale-note").waitFor({ state: "visible" });
+          await scan(page, { ...ctx, page: "/", state: "field error" });
         } catch (e) {
           errors.push({ ...ctx, message: e.message.split("\n")[0] });
         } finally {

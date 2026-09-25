@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ThemeToggle from "../components/ThemeToggle";
 
 const SITE = "https://decision-studio-one.vercel.app";
 const PORTFOLIO = "https://subhasishgoswami.com";
@@ -38,7 +39,7 @@ export default function App({ Component, pageProps }) {
         <meta property="og:title" content="Decision Studio: a live loan decisioning engine" />
         <meta
           property="og:description"
-          content="Edit the credit rules, submit an applicant, and see every step of the decision. Built by Subhasish Goswami."
+          content="Move the inputs and watch a credit decision change live, with every rule, score and step shown. Built by Subhasish Goswami."
         />
         <meta property="og:image" content={`${SITE}/thumb.png`} />
         <meta property="og:image:width" content="1200" />
@@ -59,6 +60,7 @@ export default function App({ Component, pageProps }) {
               Decision <b>Studio</b>
             </span>
           </Link>
+          <div className="nav-right">
           <nav aria-label="Main">
             <ul className="nav-links">
               {NAV.map((n) => (
@@ -74,6 +76,8 @@ export default function App({ Component, pageProps }) {
               ))}
             </ul>
           </nav>
+          <ThemeToggle />
+          </div>
         </div>
       </header>
 
